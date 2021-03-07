@@ -18,44 +18,73 @@ package com.example.androiddevchallenge
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.androiddevchallenge.ui.theme.MyTheme
+import com.example.androiddevchallenge.ui.theme.AdTheme
+import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.*
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 class MainActivity : AppCompatActivity() {
+
+    private val viewModel: AdViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MyTheme {
-                MyApp()
+            AdTheme {
+                AdScreen(
+                    viewModel.totalTimeString.observeAsState(initial = "0").value,
+                    viewModel::onTotalTimeStringChanged,
+                    viewModel.running.observeAsState(initial = false).value,
+                    viewModel::onRunningChanged,
+                    viewModel.time.observeAsState(initial = 0).value
+                )
             }
         }
     }
 }
 
-// Start building your app here!
 @Composable
-fun MyApp() {
+fun AdScreen(
+    totalTimeString: String,
+    onTotalTimeChange: (String) -> Unit,
+    running: Boolean,
+    onRunningChange: (Boolean) -> Unit,
+    time: Int
+) {
     Surface(color = MaterialTheme.colors.background) {
-        Text(text = "Ready... Set... GO!")
+        Column(Modifier.padding(16.dp)) {
+            OutlinedTextField(
+                value = totalTimeString,
+                onValueChange = { onTotalTimeChange(it) },
+                label = {
+                    Text("Time")
+                })
+            Button(onClick = { onRunningChange(!running) }) {
+                if (running) Text("Pause")
+                else Text("Start")
+            }
+            Text(text = "$time")
+        }
     }
 }
 
 @Preview("Light Theme", widthDp = 360, heightDp = 640)
 @Composable
 fun LightPreview() {
-    MyTheme {
-        MyApp()
-    }
-}
-
-@Preview("Dark Theme", widthDp = 360, heightDp = 640)
-@Composable
-fun DarkPreview() {
-    MyTheme(darkTheme = true) {
-        MyApp()
+    val viewModel: AdViewModel = AdViewModel()
+    AdTheme {
+        AdScreen(
+            viewModel.totalTimeString.observeAsState(initial = "0").value,
+            viewModel::onTotalTimeStringChanged,
+            viewModel.running.observeAsState(initial = false).value,
+            viewModel::onRunningChanged,
+            viewModel.time.observeAsState(initial = 0).value
+        )
     }
 }
