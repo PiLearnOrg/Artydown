@@ -24,9 +24,13 @@ import com.example.androiddevchallenge.ui.theme.AdTheme
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 class MainActivity : AppCompatActivity() {
@@ -58,10 +62,14 @@ fun AdScreen(
     time: Int
 ) {
     Surface(color = MaterialTheme.colors.background) {
-        Column(Modifier.padding(16.dp)) {
+        Column(
+            Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             OutlinedTextField(
                 value = totalTimeString,
                 onValueChange = { onTotalTimeChange(it) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 label = {
                     Text("Time")
                 })
