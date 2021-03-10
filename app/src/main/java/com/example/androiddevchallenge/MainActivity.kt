@@ -24,15 +24,14 @@ import com.example.androiddevchallenge.ui.theme.AdTheme
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 class MainActivity : AppCompatActivity() {
@@ -44,10 +43,7 @@ class MainActivity : AppCompatActivity() {
         setContent {
             AdTheme {
                 AdScreen(
-                    viewModel.totalTimeString.observeAsState(initial = "0").value,
                     viewModel::onTotalTimeStringChanged,
-                    viewModel.running.observeAsState(initial = false).value,
-                    viewModel::onRunningChanged,
                     viewModel.time.observeAsState(initial = 0).value
                 )
             }
@@ -57,10 +53,7 @@ class MainActivity : AppCompatActivity() {
 
 @Composable
 fun AdScreen(
-    totalTimeString: String,
-    onTotalTimeChange: (String) -> Unit,
-    running: Boolean,
-    onRunningChange: (Boolean) -> Unit,
+    onTotalTimeChange: (Int) -> Unit,
     time: Int
 ) {
     Surface(color = MaterialTheme.colors.background) {
@@ -68,24 +61,33 @@ fun AdScreen(
             Modifier.padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            OutlinedTextField(
-                value = totalTimeString,
+            IntegerSlider(
+                value = time,
                 onValueChange = { onTotalTimeChange(it) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                label = {
-                    Text("Time")
-                })
-            Button(onClick = { onRunningChange(!running) }) {
-                if (running) Text("Pause")
-                else Text("Start")
-            }
-            Text(text = "$time")
+                valueRange = 0..AdViewModel.MAX_TOTAL_TIME
+            )
             Image(
-                painter= painterResource(id = R.drawable.hourglass00 + time ),
+                modifier = Modifier.fillMaxSize(),
+                alignment = Alignment.Center,
+                contentScale = ContentScale.Fit,
+                painter = painterResource(id = R.drawable.hourglass00 + time),
                 contentDescription = "Hourglass $time visual representation"
             )
         }
     }
+}
+
+@Composable
+fun IntegerSlider(
+    value: Int,
+    onValueChange: (Int) -> Unit,
+    valueRange: IntRange = 0..100,
+) {
+    Slider(
+        value = value.toFloat(),
+        onValueChange = { onValueChange(it.toInt()) },
+        valueRange = valueRange.first.toFloat()..valueRange.last.toFloat()
+    )
 }
 
 @Preview("Light Theme", widthDp = 360, heightDp = 640)
@@ -94,10 +96,7 @@ fun LightPreview() {
     val viewModel: AdViewModel = AdViewModel()
     AdTheme {
         AdScreen(
-            viewModel.totalTimeString.observeAsState(initial = "0").value,
             viewModel::onTotalTimeStringChanged,
-            viewModel.running.observeAsState(initial = false).value,
-            viewModel::onRunningChanged,
             viewModel.time.observeAsState(initial = 0).value
         )
     }

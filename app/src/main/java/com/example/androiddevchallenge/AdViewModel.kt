@@ -1,6 +1,5 @@
 package com.example.androiddevchallenge
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,25 +7,19 @@ import kotlinx.coroutines.*
 
 class AdViewModel : ViewModel() {
 
-    private val _totalTimeString = MutableLiveData("20")
-    val totalTimeString: LiveData<String> = _totalTimeString
-    private val _running = MutableLiveData(false)
-    val running: LiveData<Boolean> = _running
-    private val _time = MutableLiveData(20)
-    val time: LiveData<Int> = _time
-
-    fun onTotalTimeStringChanged(newTotalTime: String) {
-        GlobalScope.launch(Dispatchers.Main) {
-            _totalTimeString.value = newTotalTime
-        }
+    companion object {
+        const val MAX_TOTAL_TIME = 54;
     }
 
-    fun onRunningChanged(newRunning: Boolean) {
+    private val _totalTime = MutableLiveData(MAX_TOTAL_TIME)
+    val totalTime: LiveData<Int> = _totalTime
+    private val _time = MutableLiveData(MAX_TOTAL_TIME)
+    val time: LiveData<Int> = _time
+
+    fun onTotalTimeStringChanged(newTotalTime: Int) {
         GlobalScope.launch(Dispatchers.Main) {
-            if (newRunning) {
-                onTimeChanged(totalTimeString.value?.toIntOrNull() ?: 0)
-            }
-            _running.value = newRunning
+            _totalTime.value = newTotalTime
+            _time.value = newTotalTime.toInt()
         }
     }
 
@@ -39,10 +32,9 @@ class AdViewModel : ViewModel() {
     init {
         GlobalScope.launch {
             while (true) {
-                val currentTime = time.value ?: 0
-                val currentRunning = running.value ?: false
                 delay(1000)
-                if (currentRunning && currentTime > 0)
+                val currentTime = time.value ?: 0
+                if (currentTime > 0)
                     onTimeChanged(currentTime - 1)
             }
         }
