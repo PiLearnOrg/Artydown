@@ -22,10 +22,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.androiddevchallenge.ui.theme.AdTheme
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -43,8 +41,8 @@ class MainActivity : AppCompatActivity() {
         setContent {
             AdTheme {
                 AdScreen(
-                    viewModel::onTotalTimeStringChanged,
-                    viewModel.time.observeAsState(initial = 0).value
+                    viewModel::onTimeChanged,
+                    viewModel.time.observeAsState(initial = AdViewModel.MAX_TOTAL_TIME).value
                 )
             }
         }
@@ -58,8 +56,9 @@ fun AdScreen(
 ) {
     Surface(color = MaterialTheme.colors.background) {
         Column(
-            Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceEvenly
         ) {
             IntegerSlider(
                 value = time,
@@ -67,9 +66,9 @@ fun AdScreen(
                 valueRange = 0..AdViewModel.MAX_TOTAL_TIME
             )
             Image(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxWidth(),
                 alignment = Alignment.Center,
-                contentScale = ContentScale.Fit,
+                contentScale = ContentScale.FillWidth,
                 painter = painterResource(id = R.drawable.hourglass00 + time),
                 contentDescription = "Hourglass $time visual representation"
             )
@@ -96,7 +95,7 @@ fun LightPreview() {
     val viewModel: AdViewModel = AdViewModel()
     AdTheme {
         AdScreen(
-            viewModel::onTotalTimeStringChanged,
+            viewModel::onTimeChanged,
             viewModel.time.observeAsState(initial = 0).value
         )
     }

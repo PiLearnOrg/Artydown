@@ -11,17 +11,8 @@ class AdViewModel : ViewModel() {
         const val MAX_TOTAL_TIME = 54;
     }
 
-    private val _totalTime = MutableLiveData(MAX_TOTAL_TIME)
-    val totalTime: LiveData<Int> = _totalTime
     private val _time = MutableLiveData(MAX_TOTAL_TIME)
     val time: LiveData<Int> = _time
-
-    fun onTotalTimeStringChanged(newTotalTime: Int) {
-        GlobalScope.launch(Dispatchers.Main) {
-            _totalTime.value = newTotalTime
-            _time.value = newTotalTime.toInt()
-        }
-    }
 
     fun onTimeChanged(newTime: Int) {
         GlobalScope.launch(Dispatchers.Main) {
